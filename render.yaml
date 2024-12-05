@@ -6,7 +6,7 @@ services:
   plan: starter
   envVars:
   - key: PYTHON_VERSION
-    value: 3.12.3
+    value: 3.13.0
   region: singapore
   buildCommand: pip install -r requirements.txt
   startCommand: gunicorn app:server
