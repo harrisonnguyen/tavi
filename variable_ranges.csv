@@ -1,0 +1,13 @@
+variable,min,max
+kccq_summ_bl,0,100
+age,18,105
+haemoglobin_adj,0,300
+creatinine,0,1000
+weight,25,200
+albumin_adj,0,100
+prior_af_1.0,0,1
+lvef_value,0,100
+av_area_tte,0,10
+prior_pad_1.0,0,1
+chronic_lung_4.0,0,1
+chronic_lung_3.0,0,1

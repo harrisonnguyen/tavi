@@ -1,0 +1,13 @@
+services:
+- type: web
+  name: predict-tavi
+  runtime: python
+  repo: https://github.com/harrisonnguyen/tavi
+  plan: starter
+  envVars:
+  - key: PYTHON_VERSION
+    value: 3.12.3
+  region: singapore
+  buildCommand: pip install -r requirements.txt
+  startCommand: gunicorn app:server
+version: "1"
