@@ -18,11 +18,11 @@ dash.register_page(__name__,
 df_limits = pd.read_csv('variable_ranges.csv',index_col="variable")
 df_template = pd.DataFrame(columns=df_limits.index[1:])
 
-fig = px.line(x=[],
-   labels={'index': 'Days since Discharge', 'value':'Probability of Survival'}
+default_fig = px.line(x=[],
+   labels={'index': 'Probability of Survival', 'value':'Days since Discharge'}
 )
-fig.update_yaxes(range=[0,1])
-fig.update_xaxes(range=[0,365*2])
+default_fig.update_yaxes(range=[0,1])
+default_fig.update_xaxes(range=[0,365*2])
 #df_template = pd.read_csv('dataframe_template.csv',index_col=0)
 
 continuous_features = [
@@ -58,7 +58,7 @@ controls = dbc.Card(
                     [dbc.Input(
                         id='age-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['age','min'],df_limits.loc['age','max']),
+                        placeholder="{}-{}".format(df_limits.loc['age','min'],df_limits.loc['age','max']),
                 ),
                 ]),
             ],
@@ -73,7 +73,7 @@ controls = dbc.Card(
                     dbc.Input(
                         id='weight-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['weight','min'],df_limits.loc['weight','max']),
+                        placeholder="{}-{}".format(df_limits.loc['weight','min'],df_limits.loc['weight','max']),
                 )),
             ],
             className='mb-2'
@@ -85,7 +85,7 @@ controls = dbc.Card(
                     dbc.Input(
                         id='kccq-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['kccq_summ_bl','min'],df_limits.loc['kccq_summ_bl','max']),
+                        placeholder="{}-{}".format(df_limits.loc['kccq_summ_bl','min'],df_limits.loc['kccq_summ_bl','max']),
                 )),
             ],
             className='mb-2'
@@ -97,7 +97,7 @@ controls = dbc.Card(
                     dbc.Input(
                         id='haemo-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['haemoglobin_adj','min'],df_limits.loc['haemoglobin_adj','max']),
+                        placeholder="{}-{}".format(df_limits.loc['haemoglobin_adj','min'],df_limits.loc['haemoglobin_adj','max']),
                 )),
             ],
             className='mb-2'
@@ -109,7 +109,7 @@ controls = dbc.Card(
                     dbc.Input(
                         id='creatinine-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['creatinine','min'],df_limits.loc['creatinine','max']),
+                        placeholder="{}-{}".format(df_limits.loc['creatinine','min'],df_limits.loc['creatinine','max']),
                 )),
             ],
             className='mb-2'
@@ -121,19 +121,25 @@ controls = dbc.Card(
                     dbc.Input(
                         id='albumin-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['albumin_adj','min'],df_limits.loc['albumin_adj','max']),
+                        placeholder="{}-{}".format(df_limits.loc['albumin_adj','min'],df_limits.loc['albumin_adj','max']),
                 )),
             ],
             className='mb-2'
         ),
         dbc.Row(
             [
-                dbc.Label("LVEF (%)", width=5),
+                dbc.Label(
+                    html.Span("LVEF (%)",id="tooltip-target",style={"textDecoration": "underline", "cursor": "help",'text-decoration-style': 'dotted','text-underline-offset':'0.3rem'}), 
+                    width=5,color='primary'),
+                dbc.Tooltip(html.P([
+                    html.Span("Left ventricular ejection fraction on presentation.")
+                    ]),
+                    target="tooltip-target"),
                 dbc.Col(
                     dbc.Input(
                         id='lvef-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['lvef_value','min'],df_limits.loc['lvef_value','max']),
+                        placeholder="{}-{}".format(df_limits.loc['lvef_value','min'],df_limits.loc['lvef_value','max']),
                 )),
             ],
             className='mb-2'
@@ -145,7 +151,7 @@ controls = dbc.Card(
                     dbc.Input(
                         id='av-area-input', 
                         type='number',
-                        placeholder="Between {}-{}".format(df_limits.loc['av_area_tte','min'],df_limits.loc['av_area_tte','max']),
+                        placeholder="{}-{}".format(df_limits.loc['av_area_tte','min'],df_limits.loc['av_area_tte','max']),
                 )),
             ],
             className='mb-2'
@@ -212,13 +218,21 @@ controls = dbc.Card(
 mortality_result = dbc.Card(
     dbc.CardBody(
         [
-            html.H6("1 Year Survival Rate", className="card-subtitle mb-2"),
+            html.H6("Inhospital", className="card-subtitle mb-2"),
+            dbc.Progress(
+                value=PROGRESS_BAR_MIN_VALUE, id="inhospital-mortality-prob", animated=True, striped=True,style={"height": "20px"}, color='primary'
+            ),
+            html.H6("30 Day", className="card-subtitle mb-2 mt-2"),
+            dbc.Progress(
+                value=PROGRESS_BAR_MIN_VALUE, id="month-mortality-prob", animated=True, striped=True,style={"height": "20px"}, color='primary'
+            ),
+            html.H6("1 Year", className="card-subtitle mb-2 mt-2"),
             dbc.Progress(
                 value=PROGRESS_BAR_MIN_VALUE, id="mortality-prob", animated=True, striped=True,style={"height": "20px"}, color='primary'
             ),
             dcc.Loading(
                 id="loading-1",
-                children=[dcc.Graph(id="graph",figure=fig)],
+                children=[dcc.Graph(id="graph",figure=default_fig)],
                 type="circle")
         ]
     ),
@@ -228,10 +242,11 @@ mortality_result = dbc.Card(
 
 
 
+
 risk_score = dbc.Card(
     [
         dbc.CardBody([
-            html.H4("Predicted Probability", className="card-title"),
+            html.H4("Survival Rate", className="card-title"),
             html.Hr(),
             mortality_result,
             
@@ -282,6 +297,10 @@ layout = html.Div(
     #Output('table-content', 'children'),
     Output('mortality-prob', 'value'),
     Output('mortality-prob', 'label'),
+    Output('month-mortality-prob', 'value'),
+    Output('month-mortality-prob', 'label'),
+    Output('inhospital-mortality-prob', 'value'),
+    Output('inhospital-mortality-prob', 'label'),
     Output("graph", "figure"), 
     Input('example-button', 'n_clicks'),
     State('age-input', 'value'),
@@ -314,7 +333,11 @@ def predict_risk(n_clicks,age,sex,weight,kccq,haemo,creatinine,albumin,lvef,av_a
         return (
         PROGRESS_BAR_MIN_VALUE,
         "",
-        ""
+        PROGRESS_BAR_MIN_VALUE,
+        "",
+        PROGRESS_BAR_MIN_VALUE,
+        "",
+        default_fig
     )
 
 
@@ -366,6 +389,13 @@ def predict_risk(n_clicks,age,sex,weight,kccq,haemo,creatinine,albumin,lvef,av_a
     year_mortality_value = round(survival_curve[0].y[year_index],4)
     year_mortality_label = "{:.1%}".format(year_mortality_value)
 
+    month_index = np.where(survival_curve[0].x == 30)[0][0]
+    month_mortality_value = round(survival_curve[0].y[month_index],4)
+    month_mortality_label = "{:.1%}".format(month_mortality_value)
+
+    inhospital_mortality_value = round(survival_curve[0].y[0],4)
+    inhospital_mortality_label = "{:.1%}".format(inhospital_mortality_value)
+
     
     print(year_mortality_value)
 
@@ -373,8 +403,11 @@ def predict_risk(n_clicks,age,sex,weight,kccq,haemo,creatinine,albumin,lvef,av_a
     if year_mortality_value < PROGRESS_BAR_MIN_VALUE/100:
         year_mortality_value = PROGRESS_BAR_MIN_VALUE/100
 
+    if month_mortality_value < PROGRESS_BAR_MIN_VALUE/100:
+        month_mortality_value = PROGRESS_BAR_MIN_VALUE/100
+
     
-    two_year_index = np.where(survival_curve[0].x <= 365*2)[0]
+    two_year_index = np.where(survival_curve[0].x <= 400)[0]
     
     fig = px.line(
         x=survival_curve[0].x[two_year_index], y=survival_curve[0].y[two_year_index],labels={'x': 'Days since Discharge', 'y':'Probability of Survival'})
@@ -384,6 +417,10 @@ def predict_risk(n_clicks,age,sex,weight,kccq,haemo,creatinine,albumin,lvef,av_a
         #dbc.Table.from_dataframe(df_template),
         year_mortality_value*100,
         year_mortality_label,
+        month_mortality_value*100,
+        month_mortality_label,
+        inhospital_mortality_value*100,
+        inhospital_mortality_label,
         fig
     )
 

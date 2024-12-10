@@ -7,13 +7,13 @@ import joblib
 import os
 
 
-
+LOGO = "tavi_logo.jpeg"
 app = Dash(use_pages=True,external_stylesheets=[dbc.themes.FLATLY,dbc.icons.FONT_AWESOME])
 
 server = app.server
 
 description = """
-The PREDICT-TAVI Score
+PREDICT-TAVI is a machine learning-based survival analysis model for in-hospital, 30-day and 1-year mortality in patients undergoing transcatheter aortic valve implantation, generating personalized survival curves for any timepoint within a 2-year period. This model has been derived from 16,209 patients in the Australasian Cardiac Outcomes Registry (ACOR) TAVI Registry from 2018 to 2023, achieving a cumulative dynamic AUC of 0.704 using 12 key clinical variables.
 """
 
 
@@ -36,7 +36,7 @@ offcanvas = html.Div(
                 html.P(
                     [
                         "Code of the methodology and application can be found on ", 
-                        html.A("github", href="https://github.com/harisritharan/tavi")
+                        html.A("github", href="https://github.com/harrisonnguyen/tavi",target="_blank")
                     ]
                 )
                 ],
@@ -48,9 +48,32 @@ offcanvas = html.Div(
 )
 
 
-navbar = dbc.NavbarSimple(
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            html.A(
+                # Use row and col to control vertical alignment of logo / brand
+                dbc.Row(
+                    [
+                        dbc.Col(dbc.NavbarBrand("PREDICT-TAVI Score", className="ms-2",style={"font-size": "24px"})),
+                    ],
+                    align="center",
+                    className="g-0",
+                ),
+                href="/",
+                style={"textDecoration": "none"},
+            ),
+            offcanvas   
+        ]
+    ),
+    color="primary",
+    dark=True,
+    style={'border-radius': '10px'},
+)
+
+navbar_old = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Mortality", href="/")),
+        
         offcanvas
     ],
     brand="PREDICT-TAVI Score",
@@ -58,7 +81,7 @@ navbar = dbc.NavbarSimple(
     color="primary",
     dark=True,
     class_name='mb-3',
-    style={'border-radius': '10px'},
+    style={'border-radius': '10px','font-size': '200px !important'},
     links_left=False,
     fluid=True
 )

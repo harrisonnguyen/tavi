@@ -1,1 +1,3 @@
-# tavi
+# PREDICT-TAVI
+
+PREDICT-TAVI is a machine learning-based survival analysis model for in-hospital, 30-day and 1-year mortality in patients undergoing transcatheter aortic valve implantation, generating personalized survival curves for any timepoint within a 2-year period. This model has been derived from 16,209 patients in the Australasian Cardiac Outcomes Registry (ACOR) TAVI Registry from 2018 to 2023, achieving a cumulative dynamic AUC of 0.704 using 12 key clinical variables.
