@@ -9,3 +9,5 @@ scikit-learn==1.5.2
 scikit-survival==0.23.1
 scipy==1.14.1
 gunicorn==23.0.0
+matplotlib==3.10.0
+seaborn==0.13.2
